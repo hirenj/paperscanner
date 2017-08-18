@@ -1,4 +1,4 @@
-
+window.onload = function() {
 var width = 800;
 var height = 600;
 var video = document.querySelector('video');
@@ -69,4 +69,5 @@ try {
   }, handleError);
 } catch(e) {
   handleError(e)
+}
 }
