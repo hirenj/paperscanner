@@ -61,11 +61,11 @@ function handleError() {
 
 try {
   getUserMedia({video: true}, function(stream) {
-    console.log(stream);
     var button = document.querySelector('button');
     button.style.display = 'block';
     button.onclick = snapshot;
-    video.src = window.URL.createObjectURL(stream);
+    // video.src = window.URL.createObjectURL(stream);
+    video.srcObject = stream;
     localMediaStream = stream;
   }, handleError);
 } catch(e) {
