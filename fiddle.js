@@ -61,6 +61,7 @@ function handleError() {
 
 try {
   getUserMedia({video: true}, function(stream) {
+    console.log(stream);
     var button = document.querySelector('button');
     button.style.display = 'block';
     button.onclick = snapshot;
