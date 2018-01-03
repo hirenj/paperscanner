@@ -58,16 +58,19 @@ function handleError() {
   document.body.innerHTML = 'There was an error, check the developer tools console';
   console.error(arguments);
 }
+let ids_promise = navigator.mediaDevices.enumerateDevices().then( devices => devices.filter( dev => dev.label.indexOf('Back') >= 0).map( dev => dev.deviceId ) );
 
 try {
-  getUserMedia({video: true}, function(stream) {
-    var button = document.querySelector('button');
-    button.style.display = 'block';
-    button.onclick = snapshot;
-    // video.src = window.URL.createObjectURL(stream);
-    video.srcObject = stream;
-    localMediaStream = stream;
-  }, handleError);
+  ids_promise.then(ids => {
+    getUserMedia({video: deviceId: { exact: ids[0] }}, function(stream) {
+      var button = document.querySelector('button');
+      button.style.display = 'block';
+      button.onclick = snapshot;
+      // video.src = window.URL.createObjectURL(stream);
+      video.srcObject = stream;
+      localMediaStream = stream;
+    }, handleError);
+  }).catch(handleError);
 } catch(e) {
   handleError(e)
 }
