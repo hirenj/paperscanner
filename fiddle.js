@@ -62,7 +62,8 @@ let ids_promise = navigator.mediaDevices.enumerateDevices().then( devices => dev
 
 try {
   ids_promise.then(ids => {
-    getUserMedia({video: { deviceId: { exact: ids[0] }}}, function(stream) {
+    console.log("Hooking up id ",ids[0]);
+    getUserMedia({video: { facingMode: { exact: "environment" }}}, function(stream) {
       var button = document.querySelector('button');
       button.style.display = 'block';
       button.onclick = snapshot;
