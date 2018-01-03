@@ -62,7 +62,7 @@ let ids_promise = navigator.mediaDevices.enumerateDevices().then( devices => dev
 
 try {
   ids_promise.then(ids => {
-    getUserMedia({video: deviceId: { exact: ids[0] }}, function(stream) {
+    getUserMedia({video: { deviceId: { exact: ids[0] }}}, function(stream) {
       var button = document.querySelector('button');
       button.style.display = 'block';
       button.onclick = snapshot;
