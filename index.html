@@ -5,15 +5,22 @@
 <style>
 #doi {
 	font-family: Courier;
+	width: 100px;
 }
 #title {
 	font-weight: bold;
+	width: 500px;
 }
 </style>
 </head>
 <body>
+	<form name="accept_paper">
+		<input id="doi" name="doi" type="text"/>
+		<input id="title" name="title" type="text"/>
+		<button type="submit">Add paper</button>
+	</form>
 <div>
-	<span id="progress">0%</span><span id="doi"></span><span id="title"></span>
+	<span id="progress">0%</span>
 </div>
 <pre id="detected">
   No title
