@@ -1,6 +1,6 @@
 window.onload = function() {
-var width = 800;
-var height = 600;
+var width = 600;
+var height = 800;
 var video = document.querySelector('video');
 var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
@@ -20,23 +20,25 @@ function summarise_item(item) {
 };
 
 function get_publication_details(title) {
-	return;
 	if (title.length < 1) {
+    document.getElementById('progress').textContent = 'No title detected';
     return;
   }
+  console.log(title);
 	fetch('https://api.crossref.org/works?query='+encodeURIComponent(title)).then( response => response.json() ).then( json => {
   	console.log(json.message.items.map(summarise_item)[0]);
+    document.getElementById('doi').textContent = json.message.items.map(summarise_item)[0].doi;
+    document.getElementById('title').textContent = json.message.items.map(summarise_item)[0].title;
   });
 };
 
 function snapshot() {
   if(!localMediaStream) return;
-  ctx.drawImage(video, 0, 0, width, height);
-  //document.querySelector('img').src = canvas.toDataURL('image/webp');
-  //document.querySelector('img').src
+  ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
   Tesseract.recognize(video)
-         .progress(function  (p) { document.getElementById('progress').textContent = parseInt(100*p.progress)+'%'  })
+         .progress(function  (p) { if (p.status !== 'recognizing text') { return; } document.getElementById('progress').textContent = parseInt(100*p.progress)+'%'  })
          .then(function (result) {
+            document.getElementById('progress').textContent = '';
          		console.log('result', result);
             texts = result.lines.filter( line => line.confidence > 80).map( line => line.text ).join('\n').replace(/[\n\s]+/,' ');
             document.getElementById('detected').textContent = texts;
@@ -44,35 +46,42 @@ function snapshot() {
           })
 }
 
-function getUserMedia(options, success, error) {
-  var getUserMedia = 'getUserMedia webkitGetUserMedia mozGetUserMedia msGetUserMedia oGetUserMedia'.split(' ').reduce(function(found, name) {
-    return found || (typeof(navigator[name]) === 'function' && name);
-  }, false);
-  
-  if(getUserMedia) return navigator[getUserMedia](options, success, error);
-  
-  throw new Error('This browser has no support to navigator.getUserMedia.');
-}
-
 function handleError() {
   document.body.innerHTML = 'There was an error, check the developer tools console';
   console.error(arguments);
 }
-let ids_promise = navigator.mediaDevices.enumerateDevices().then( devices => devices.filter( dev => dev.label.indexOf('Back') >= 0).map( dev => dev.deviceId ) );
 
-try {
-  ids_promise.then(ids => {
-    console.log("Hooking up id ",ids[0]);
-    getUserMedia({video: { facingMode: { exact: "environment" }}}, function(stream) {
-      var button = document.querySelector('button');
-      button.style.display = 'block';
-      button.onclick = snapshot;
-      // video.src = window.URL.createObjectURL(stream);
-      video.srcObject = stream;
-      localMediaStream = stream;
-    }, handleError);
-  }).catch(handleError);
-} catch(e) {
-  handleError(e)
+function gotStream(stream) {
+  var button = document.querySelector('button.scan');
+  button.style.display = 'block';
+  button.onclick = snapshot;
+  video.srcObject = stream;
+  video.onloadedmetadata = function(e) {
+    canvas.style.height = video.videoHeight;
+    canvas.style.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth;
+    video.width = video.videoWidth;
+    video.height = video.videoHeight;
+    video.style.width = video.videoWidth;
+    video.style.height = video.videoHeight;
+  };
+  localMediaStream = stream;
 }
+
+function gotDevices(results) {
+  var device;
+  var videos = results.filter( res => res.kind == 'videoinput');
+  try {
+    navigator.mediaDevices.getUserMedia({video: { deviceId: { exact: videos[0].deviceId } }}).then(gotStream).catch(handleError);
+  } catch(e) {
+    handleError(e)
+  }
 }
+
+navigator.mediaDevices
+  .enumerateDevices()
+  .then(gotDevices)
+  .catch(handleError);
+
+};
