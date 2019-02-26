@@ -1,13 +1,23 @@
 <html>
 <head>
-<script src='https://cdn.rawgit.com/naptha/tesseract.js/1.0.10/dist/tesseract.js'></script>
+<script src='https://cdn.jsdelivr.net/gh/naptha/tesseract.js@v1.0.14/dist/tesseract.min.js'></script>
 <script src='fiddle.js'></script>
+<style>
+#doi {
+	font-family: Courier;
+}
+#title {
+	font-weight: bold;
+}
+</style>
 </head>
 <body>
-<h3 id="progress">0%</h3>
+<div>
+	<span id="progress">0%</span><span id="doi"></span><span id="title"></span>
+</div>
 <pre id="detected">
   No title
 </pre>
-<button style="display:none;">Scan</button><video autoplay playsinline controls="true"></video><canvas style="display:none;"></canvas>
+<button class="scan" style="display:none;">Scan</button><video autoplay playsinline></video><canvas></canvas>
 </body>
 </html>
