@@ -6,6 +6,24 @@ var canvas = document.querySelector('canvas');
 var ctx = canvas.getContext('2d');
 var localMediaStream = null;
 
+var scriptid = 'GOOGLESCRIPTID';
+
+var searchParams = new URLSearchParams(window.location.search);
+
+scriptid = searchParams.get('scriptid');
+
+var scriptURL = 'https://script.google.com/macros/s/'+scriptid+'/exec';
+
+const form = document.forms['accept_paper']
+
+form.addEventListener('submit', e => {
+  e.preventDefault();
+  fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+    .then(response => console.log('Success!', response))
+    .catch(error => console.error('Error!', error.message))
+});
+
+
 [].slice.call(document.querySelectorAll('video, img, canvas')).forEach(function(node) {
   node.style.width = (node.width = width) + 'px';
   node.style.height = (node.height = height) + 'px';
@@ -27,8 +45,8 @@ function get_publication_details(title) {
   console.log(title);
 	fetch('https://api.crossref.org/works?query='+encodeURIComponent(title)).then( response => response.json() ).then( json => {
   	console.log(json.message.items.map(summarise_item)[0]);
-    document.getElementById('doi').textContent = json.message.items.map(summarise_item)[0].doi;
-    document.getElementById('title').textContent = json.message.items.map(summarise_item)[0].title;
+    document.getElementById('doi').value = json.message.items.map(summarise_item)[0].doi;
+    document.getElementById('title').value = json.message.items.map(summarise_item)[0].title;
   });
 };
 
